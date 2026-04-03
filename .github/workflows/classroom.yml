@@ -1,0 +1,106 @@
+name: Autograding Tests
+on:
+  - push
+  - workflow_dispatch
+  - repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    # Exercise 1: Collision Attack on Hash0
+    - name: Exercise 1 - Collision Attack
+      id: exercise1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: "Exercise 1: Hash0 Collision Attack"
+        command: "output=$(python3 graders/check_exercise01.py 2>&1); echo \"$output\" >&2; echo \"$output\""
+        expected-output: "PASS"
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    
+    # Exercise 2: Second Pre-image Attack on Hash0  
+    - name: Exercise 2 - Second Pre-image Attack
+      id: exercise2
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: "Exercise 2: Hash0 Second Pre-image Attack"
+        command: "output=$(python3 graders/check_exercise02.py 2>&1); echo \"$output\" >&2; echo \"$output\""
+        expected-output: "PASS"
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    
+    # Exercise 3: First Pre-image Attack on Hash0
+    - name: Exercise 3 - First Pre-image Attack
+      id: exercise3
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: "Exercise 3: Hash0 First Pre-image Attack"
+        command: "output=$(python3 graders/check_exercise03.py 2>&1); echo \"$output\" >&2; echo \"$output\""
+        expected-output: "PASS"
+        comparison-method: exact
+        timeout: 10
+        max-score: 10
+    
+    # Exercise 4: Brute Force Collision on Hash1
+    - name: Exercise 4 - Brute Force Collision
+      id: exercise4
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: "Exercise 4: Hash1 Brute Force Collision"
+        command: "output=$(python3 graders/check_exercise04.py 2>&1); echo \"$output\" >&2; echo \"$output\""
+        expected-output: "PASS"
+        comparison-method: exact
+        timeout: 1200  # 20 minutes for brute force
+        max-score: 20
+    
+    # Exercise 5: Personal Second Pre-image on Hash1
+    - name: Exercise 5 - Personal Second Pre-image
+      id: exercise5
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: "Exercise 5: Hash1 Personal Second Pre-image"
+        command: "output=$(python3 graders/check_exercise05.py 2>&1); echo \"$output\" >&2; echo \"$output\""
+        expected-output: "PASS"
+        comparison-method: exact
+        timeout: 3600  # 60 minutes for preimage attack
+        max-score: 30
+    
+    # Exercise 6: SHA256 Proof-of-Work
+    - name: Exercise 6 - SHA256 Proof of Work
+      id: exercise6
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: "Exercise 6: SHA256 Proof-of-Work"
+        command: "output=$(python3 graders/check_exercise06.py 2>&1); echo \"$output\" >&2; echo \"$output\""
+        expected-output: "PASS"
+        comparison-method: exact
+        timeout: 300  # 5 minutes for proof-of-work
+        max-score: 20
+    
+    # Report results
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        EXERCISE1_RESULTS: "${{ steps.exercise1.outputs.result }}"
+        EXERCISE2_RESULTS: "${{ steps.exercise2.outputs.result }}"
+        EXERCISE3_RESULTS: "${{ steps.exercise3.outputs.result }}"
+        EXERCISE4_RESULTS: "${{ steps.exercise4.outputs.result }}"
+        EXERCISE5_RESULTS: "${{ steps.exercise5.outputs.result }}"
+        EXERCISE6_RESULTS: "${{ steps.exercise6.outputs.result }}"
+      with:
+        runners: exercise1,exercise2,exercise3,exercise4,exercise5,exercise6
