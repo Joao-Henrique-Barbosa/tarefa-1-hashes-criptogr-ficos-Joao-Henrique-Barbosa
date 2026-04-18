@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "bitcoin42353,bitcoin781629,bitcoin41453713"
